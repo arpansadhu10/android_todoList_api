@@ -36,6 +36,11 @@ exports.register = bigPromise(async (req, res, next) => {
 
     } catch (error) {
         console.log(error);
+        res.status(400).json({
+            success: false,
+            msg: `user creation unsuccessfull , ${error.message}`,
+            token: null
+        })
     }
     // next();
 })
@@ -45,16 +50,35 @@ exports.login = bigPromise(async (req, res, next) => {
     console.log(email, password);
     if (!email || !password) {
         console.log("enter password and email...");
-        return res.status(400).send("enter email and passsword")
+        return res.status(400).json({
+            success: false,
+            msg: 'enter email and password',
+            token: undefined,
+            user: undefined
+        });
     }
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
-        return res.status(400).send("user not found in db");
+        return res.status(400).json({
+            success: false,
+            msg: 'User not found in db',
+            token: undefined,
+            user: undefined
+        });
     }
 
     const isPasswordValid = await user.isValidatedPassword(password);
     if (!isPasswordValid) {
-        return res.status(400).send("password wrong")
+        const variable =
+        {
+            success: false,
+            msg: 'password wrong',
+            token: undefined,
+            user: undefined
+        }
+
+
+        return res.status(400).json(variable);
     }
 
     const payload = {
